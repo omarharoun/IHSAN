@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light theme styles */
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+}
+
+.light body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.light .bg-black {
+  background-color: var(--bg-primary);
+}
+
+.light .bg-gray-900 {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.light .bg-gray-800 {
+  background-color: #f1f5f9;
+  border-color: var(--border-color);
+}
+
+.light .text-white {
+  color: var(--text-primary);
+}
+
+.light .text-gray-400 {
+  color: var(--text-secondary);
+}
+
+.light .border-gray-800 {
+  border-color: var(--border-color);
+}
+
+.light .border-gray-700 {
+  border-color: var(--border-color);
+}
