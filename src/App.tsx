@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { AuthForm } from './components/Auth/AuthForm';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { IHSANDashboard } from './components/IHSANDashboard/IHSANDashboard';
+import { MobileNavigation } from './components/Mobile/MobileNavigation';
 import { useAuth } from './hooks/useAuth';
 import { Brain, Home } from 'lucide-react';
 
@@ -30,8 +31,15 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black">
-      {/* App Switcher */}
-      <div className="bg-gray-900 border-b border-gray-800">
+      {/* Mobile Navigation */}
+      <MobileNavigation
+        activeApp={activeApp}
+        onAppChange={setActiveApp}
+        onOpenChat={() => {}} // Will be handled by individual dashboards
+      />
+
+      {/* Desktop App Switcher */}
+      <div className="hidden lg:block bg-gray-900 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             <button
@@ -66,6 +74,7 @@ function App() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
+        className="pb-20 lg:pb-0" // Add bottom padding for mobile nav
       >
         {activeApp === 'mindflow' ? (
           <Dashboard />

@@ -32,18 +32,18 @@ export function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 safe-area-all">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-900 rounded-3xl p-8 w-full max-w-md border border-gray-800"
+        className="bg-gray-900 rounded-3xl p-6 sm:p-8 w-full max-w-md border border-gray-800"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Learning Hub</h1>
-          <p className="text-gray-400">Your AI-powered learning companion</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-mobile-3xl font-bold text-white mb-2">Learning Hub</h1>
+          <p className="text-gray-400 text-mobile-sm">Your AI-powered learning companion</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {isSignUp && (
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -52,7 +52,7 @@ export function AuthForm() {
                 placeholder="Full Name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                className="input-mobile w-full bg-gray-800 pl-12 pr-4 text-white placeholder-gray-400"
                 required
               />
             </div>
@@ -65,7 +65,7 @@ export function AuthForm() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+              className="input-mobile w-full bg-gray-800 pl-12 pr-4 text-white placeholder-gray-400"
               required
             />
           </div>
@@ -77,7 +77,7 @@ export function AuthForm() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+              className="input-mobile w-full bg-gray-800 pl-12 pr-4 text-white placeholder-gray-400"
               required
             />
           </div>
@@ -91,7 +91,7 @@ export function AuthForm() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50"
+            className="btn-touch w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50"
           >
             {loading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
           </motion.button>

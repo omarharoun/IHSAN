@@ -38,7 +38,7 @@ export function TopNavigation({ onOpenChat }: TopNavigationProps) {
   }
 
   return (
-    <nav className="flex items-center justify-between p-6 bg-black/50 backdrop-blur-md border-b border-gray-800">
+    <nav className="hidden lg:flex items-center justify-between p-6 bg-black/50 backdrop-blur-md border-b border-gray-800">
       <div className="flex items-center space-x-4">
         <h1 className="text-2xl font-bold text-white">Learning Hub</h1>
       </div>

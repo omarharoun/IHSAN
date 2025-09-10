@@ -18,6 +18,7 @@ import { FeedVideoCard } from './FeedVideoCard';
 import { NotificationBadge } from './NotificationBadge';
 import { QuickCapture } from './QuickCapture';
 import { SearchBar } from './SearchBar';
+import { MobileBottomNav } from '../Mobile/MobileBottomNav';
 
 interface IHSANDashboardProps {
   activeTab: string;
@@ -40,15 +41,15 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
     switch (activeTab) {
       case 'home':
         return (
-          <div className="space-y-6">
+          <div className="space-mobile">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-white">Welcome to IHSAN</h1>
+              <h1 className="text-mobile-3xl font-bold text-white">Welcome to IHSAN</h1>
               <NotificationBadge count={notifications} />
             </div>
             
             <SearchBar />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid-mobile-3">
               <DashboardTile
                 title="Quick Capture"
                 description="Capture ideas instantly"
@@ -76,8 +77,8 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
       
       case 'feed':
         return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white">Feed</h1>
+          <div className="space-mobile">
+            <h1 className="text-mobile-3xl font-bold text-white">Feed</h1>
             <div className="space-y-4">
               <FeedVideoCard
                 title="Introduction to React Hooks"
@@ -101,9 +102,9 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
       
       case 'learn':
         return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white">Learning Hub</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-mobile">
+            <h1 className="text-mobile-3xl font-bold text-white">Learning Hub</h1>
+            <div className="grid-mobile-3">
               <DashboardTile
                 title="Web Development"
                 description="Master modern web technologies"
@@ -131,9 +132,9 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
       
       case 'work':
         return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white">Work Dashboard</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-mobile">
+            <h1 className="text-mobile-3xl font-bold text-white">Work Dashboard</h1>
+            <div className="grid-mobile-3">
               <DashboardTile
                 title="Current Projects"
                 description="3 active projects"
@@ -161,9 +162,9 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
       
       case 'tools':
         return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white">Tools & Utilities</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-mobile">
+            <h1 className="text-mobile-3xl font-bold text-white">Tools & Utilities</h1>
+            <div className="grid-mobile-3">
               <DashboardTile
                 title="Code Generator"
                 description="Generate code snippets"
@@ -191,15 +192,15 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
       
       case 'profile':
         return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white">Profile</h1>
-            <div className="bg-gray-800 rounded-lg p-6">
+          <div className="space-mobile">
+            <h1 className="text-mobile-3xl font-bold text-white">Profile</h1>
+            <div className="card-mobile">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                   <User className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white">User Name</h2>
+                  <h2 className="text-mobile-xl font-semibold text-white">User Name</h2>
                   <p className="text-gray-400">user@example.com</p>
                 </div>
               </div>
@@ -214,8 +215,8 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Tab Navigation */}
-      <div className="bg-gray-900 border-b border-gray-800">
+      {/* Desktop Tab Navigation */}
+      <div className="hidden lg:block bg-gray-900 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
             {tabs.map((tab) => {
@@ -240,7 +241,7 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
@@ -250,6 +251,13 @@ export const IHSANDashboard: React.FC<IHSANDashboardProps> = ({ activeTab, onTab
           {renderTabContent()}
         </motion.div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        onQuickAction={() => {}} // Add quick action handler
+      />
     </div>
   );
 };

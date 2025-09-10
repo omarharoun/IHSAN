@@ -91,23 +91,23 @@ export function Dashboard() {
     <div className="min-h-screen bg-black">
       <TopNavigation onOpenChat={() => setShowChat(true)} />
       
-      <main className="p-6">
+      <main className="p-mobile">
         {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid-mobile-3 mb-8">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`bg-gradient-to-br ${stat.color} rounded-2xl p-6 text-white`}
+              className={`bg-gradient-to-br ${stat.color} rounded-2xl p-4 sm:p-6 text-white`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/80 text-sm">{stat.label}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
+                  <p className="text-white/80 text-mobile-sm">{stat.label}</p>
+                  <p className="text-mobile-3xl font-bold">{stat.value}</p>
                 </div>
-                <stat.icon className="w-8 h-8 text-white/80" />
+                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white/80" />
               </div>
             </motion.div>
           ))}
@@ -120,15 +120,15 @@ export function Dashboard() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowCreateModal(true)}
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl p-8 mb-8 transition-all group"
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl p-6 sm:p-8 mb-8 transition-all group btn-touch"
         >
-          <div className="flex items-center justify-center space-x-4">
-            <div className="p-3 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
-              <Plus className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center space-x-3 sm:space-x-4">
+            <div className="p-2 sm:p-3 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+              <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <div className="text-left">
-              <h3 className="text-white text-xl font-bold">Create New Lesson</h3>
-              <p className="text-white/80">Generate streaming lessons with AI</p>
+              <h3 className="text-white text-mobile-lg font-bold">Create New Lesson</h3>
+              <p className="text-white/80 text-mobile-sm">Generate streaming lessons with AI</p>
             </div>
           </div>
         </motion.button>
@@ -149,7 +149,7 @@ export function Dashboard() {
             <p className="text-gray-400">Create your first streaming lesson to get started!</p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid-mobile-4">
             {lessonSeries.map((series, index) => (
               <motion.div
                 key={series.id}

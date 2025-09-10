@@ -94,7 +94,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="modal-mobile">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -107,24 +107,24 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative bg-gray-900 rounded-3xl w-full max-w-2xl h-[600px] border border-gray-800 flex flex-col"
+            className="modal-content-mobile w-full max-w-2xl h-[600px] sm:h-[700px] flex flex-col"
           >
-            <div className="flex items-center justify-between p-6 border-b border-gray-800">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-800">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl">
-                  <Bot className="w-6 h-6 text-white" />
+                  <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-white">AI Assistant</h2>
+                <h2 className="text-mobile-lg font-bold text-white">AI Assistant</h2>
               </div>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-800 rounded-xl transition-colors"
               >
-                <X className="w-6 h-6 text-gray-400" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scrollbar-hide">
               {messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -177,7 +177,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="p-6 border-t border-gray-800">
+            <div className="p-4 sm:p-6 border-t border-gray-800">
               <div className="flex items-center space-x-3">
                 <input
                   type="text"
@@ -185,7 +185,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me anything about your learning..."
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="input-mobile flex-1 bg-gray-800 text-white placeholder-gray-400"
                   disabled={loading}
                 />
                 <motion.button
@@ -193,7 +193,7 @@ export function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                   whileTap={{ scale: 0.95 }}
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || loading}
-                  className="p-3 bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-touch p-3 bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-5 h-5 text-white" />
                 </motion.button>
