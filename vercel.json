@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "functions": {
+    "api/browser.js": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NODE_OPTIONS": "--dns-result-order=ipv4first"
+  }
+}
