@@ -2,15 +2,13 @@
   "name": "vercel-browser-connectivity",
   "version": "1.0.0",
   "description": "Vercel-compatible browser connectivity solution",
-  "main": "vercel-browser-fix.js",
+  "main": "api/browser.js",
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'No build step required'",
-    "start": "node vercel-browser-fix.js"
+    "start": "node api/browser.js"
   },
-  "dependencies": {
-    "dns": "^0.2.2"
-  },
+  "dependencies": {},
   "engines": {
     "node": ">=18.0.0"
   },
