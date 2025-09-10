@@ -7,7 +7,8 @@ import { EmbeddedBrowser } from './EmbeddedBrowser';
 import { TextContentViewer } from './TextContentViewer';
 import { search, type SearchResponse } from '../../lib/search-client';
 import { knowledgeTracker, KnowledgeNode } from '../../lib/knowledge-tracker';
-import { Search, Clock, Bookmark, ExternalLink, Brain, TrendingUp, Target } from 'lucide-react';
+import { KnowledgeGraph } from '../Knowledge/KnowledgeGraph';
+import { Search, Clock, Bookmark, ExternalLink, Brain, TrendingUp, Target, Network } from 'lucide-react';
 
 type ChatItem = { id: string; role: 'user' | 'assistant'; content: string };
 
@@ -24,6 +25,7 @@ export function MawridDashboard() {
     const [knowledgeStats, setKnowledgeStats] = useState(knowledgeTracker.getKnowledgeStats());
     const [trackedNodes, setTrackedNodes] = useState<KnowledgeNode[]>([]);
     const [showKnowledgePanel, setShowKnowledgePanel] = useState(false);
+    const [knowledgeViewMode, setKnowledgeViewMode] = useState<'list' | 'graph'>('graph');
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     // Load suggestions when query changes
@@ -389,109 +391,139 @@ export function MawridDashboard() {
                                     <Brain className="w-6 h-6 text-blue-400" />
                                     <h2 className="text-xl font-semibold text-white">Your Knowledge Journey</h2>
                                 </div>
-                                <button
-                                    onClick={() => setShowKnowledgePanel(false)}
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                >
-                                    ✕
-                                </button>
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => setKnowledgeViewMode('graph')}
+                                            className={`p-2 rounded-lg transition-colors ${
+                                                knowledgeViewMode === 'graph' 
+                                                    ? 'bg-blue-600 text-white' 
+                                                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            <Network className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => setKnowledgeViewMode('list')}
+                                            className={`p-2 rounded-lg transition-colors ${
+                                                knowledgeViewMode === 'list' 
+                                                    ? 'bg-blue-600 text-white' 
+                                                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            <TrendingUp className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowKnowledgePanel(false)}
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
-                        <div className="p-6 overflow-y-auto max-h-[60vh]">
-                            {/* Knowledge Stats */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-700/50">
-                                    <div className="text-2xl font-bold text-blue-400">{knowledgeStats.totalNodes}</div>
-                                    <div className="text-sm text-gray-400">Knowledge Nodes</div>
-                                </div>
-                                <div className="bg-green-900/20 p-4 rounded-lg border border-green-700/50">
-                                    <div className="text-2xl font-bold text-green-400">{Math.floor(knowledgeStats.totalTimeSpent / 60)}m</div>
-                                    <div className="text-sm text-gray-400">Time Invested</div>
-                                </div>
-                                <div className="bg-purple-900/20 p-4 rounded-lg border border-purple-700/50">
-                                    <div className="text-2xl font-bold text-purple-400">{knowledgeStats.topicsExplored}</div>
-                                    <div className="text-sm text-gray-400">Topics Explored</div>
-                                </div>
-                                <div className="bg-orange-900/20 p-4 rounded-lg border border-orange-700/50">
-                                    <div className="text-2xl font-bold text-orange-400">{Math.round(knowledgeStats.masteryLevel)}%</div>
-                                    <div className="text-sm text-gray-400">Mastery Level</div>
-                                </div>
+                        {knowledgeViewMode === 'graph' ? (
+                            <div className="h-[60vh]">
+                                <KnowledgeGraph />
                             </div>
+                        ) : (
+                            <div className="p-6 overflow-y-auto max-h-[60vh]">
+                                {/* Knowledge Stats */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                    <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-700/50">
+                                        <div className="text-2xl font-bold text-blue-400">{knowledgeStats.totalNodes}</div>
+                                        <div className="text-sm text-gray-400">Knowledge Nodes</div>
+                                    </div>
+                                    <div className="bg-green-900/20 p-4 rounded-lg border border-green-700/50">
+                                        <div className="text-2xl font-bold text-green-400">{Math.floor(knowledgeStats.totalTimeSpent / 60)}m</div>
+                                        <div className="text-sm text-gray-400">Time Invested</div>
+                                    </div>
+                                    <div className="bg-purple-900/20 p-4 rounded-lg border border-purple-700/50">
+                                        <div className="text-2xl font-bold text-purple-400">{knowledgeStats.topicsExplored}</div>
+                                        <div className="text-sm text-gray-400">Topics Explored</div>
+                                    </div>
+                                    <div className="bg-orange-900/20 p-4 rounded-lg border border-orange-700/50">
+                                        <div className="text-2xl font-bold text-orange-400">{Math.round(knowledgeStats.masteryLevel)}%</div>
+                                        <div className="text-sm text-gray-400">Mastery Level</div>
+                                    </div>
+                                </div>
 
-                            {/* Recent Knowledge Nodes */}
-                            {trackedNodes.length > 0 && (
-                                <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-                                        <TrendingUp className="w-5 h-5" />
-                                        <span>Recently Learned</span>
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {trackedNodes.slice(-5).reverse().map((node, index) => (
-                                            <div key={node.id} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <h4 className="font-medium text-white text-sm">{node.title}</h4>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className={`px-2 py-1 rounded text-xs ${
-                                                            node.difficulty === 'beginner' ? 'bg-green-900/50 text-green-400' :
-                                                            node.difficulty === 'intermediate' ? 'bg-yellow-900/50 text-yellow-400' :
-                                                            'bg-red-900/50 text-red-400'
-                                                        }`}>
-                                                            {node.difficulty}
-                                                        </span>
-                                                        <span className={`px-2 py-1 rounded text-xs ${
-                                                            node.understanding === 'explored' ? 'bg-blue-900/50 text-blue-400' :
-                                                            node.understanding === 'learning' ? 'bg-purple-900/50 text-purple-400' :
-                                                            'bg-green-900/50 text-green-400'
-                                                        }`}>
-                                                            {node.understanding}
-                                                        </span>
+                                {/* Recent Knowledge Nodes */}
+                                {trackedNodes.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                                            <TrendingUp className="w-5 h-5" />
+                                            <span>Recently Learned</span>
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {trackedNodes.slice(-5).reverse().map((node, index) => (
+                                                <div key={node.id} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                                                    <div className="flex items-start justify-between mb-2">
+                                                        <h4 className="font-medium text-white text-sm">{node.title}</h4>
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className={`px-2 py-1 rounded text-xs ${
+                                                                node.difficulty === 'beginner' ? 'bg-green-900/50 text-green-400' :
+                                                                node.difficulty === 'intermediate' ? 'bg-yellow-900/50 text-yellow-400' :
+                                                                'bg-red-900/50 text-red-400'
+                                                            }`}>
+                                                                {node.difficulty}
+                                                            </span>
+                                                            <span className={`px-2 py-1 rounded text-xs ${
+                                                                node.understanding === 'explored' ? 'bg-blue-900/50 text-blue-400' :
+                                                                node.understanding === 'learning' ? 'bg-purple-900/50 text-purple-400' :
+                                                                'bg-green-900/50 text-green-400'
+                                                            }`}>
+                                                                {node.understanding}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-gray-400 text-sm mb-2">{node.snippet}</p>
+                                                    <div className="flex items-center justify-between text-xs text-gray-500">
+                                                        <span>{node.domain}</span>
+                                                        <span>{Math.floor(node.timeSpent / 60)}m spent</span>
                                                     </div>
                                                 </div>
-                                                <p className="text-gray-400 text-sm mb-2">{node.snippet}</p>
-                                                <div className="flex items-center justify-between text-xs text-gray-500">
-                                                    <span>{node.domain}</span>
-                                                    <span>{Math.floor(node.timeSpent / 60)}m spent</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Learning Insights */}
+                                {knowledgeTracker.getInsights().length > 0 && (
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                                            <Target className="w-5 h-5" />
+                                            <span>Learning Insights</span>
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {knowledgeTracker.getInsights().slice(0, 3).map((insight, index) => (
+                                                <div key={index} className={`p-4 rounded-lg border-l-4 ${
+                                                    insight.priority === 'high' ? 'border-red-500 bg-red-900/20' :
+                                                    insight.priority === 'medium' ? 'border-yellow-500 bg-yellow-900/20' :
+                                                    'border-green-500 bg-green-900/20'
+                                                }`}>
+                                                    <p className="text-sm text-gray-300">{insight.message}</p>
+                                                    {insight.action && (
+                                                        <button className="mt-2 text-xs text-blue-400 hover:text-blue-300 underline">
+                                                            {insight.action}
+                                                        </button>
+                                                    )}
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Learning Insights */}
-                            {knowledgeTracker.getInsights().length > 0 && (
-                                <div>
-                                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-                                        <Target className="w-5 h-5" />
-                                        <span>Learning Insights</span>
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {knowledgeTracker.getInsights().slice(0, 3).map((insight, index) => (
-                                            <div key={index} className={`p-4 rounded-lg border-l-4 ${
-                                                insight.priority === 'high' ? 'border-red-500 bg-red-900/20' :
-                                                insight.priority === 'medium' ? 'border-yellow-500 bg-yellow-900/20' :
-                                                'border-green-500 bg-green-900/20'
-                                            }`}>
-                                                <p className="text-sm text-gray-300">{insight.message}</p>
-                                                {insight.action && (
-                                                    <button className="mt-2 text-xs text-blue-400 hover:text-blue-300 underline">
-                                                        {insight.action}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
+                                {trackedNodes.length === 0 && (
+                                    <div className="text-center py-8 text-gray-400">
+                                        <Brain className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                                        <p>Start clicking on search results to build your knowledge map!</p>
                                     </div>
-                                </div>
-                            )}
-
-                            {trackedNodes.length === 0 && (
-                                <div className="text-center py-8 text-gray-400">
-                                    <Brain className="w-12 h-12 mx-auto mb-4 text-gray-600" />
-                                    <p>Start clicking on search results to build your knowledge map!</p>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
