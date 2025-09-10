@@ -2,29 +2,65 @@
 async function getAdditionalSearchResults(query, limit) {
   const additionalResults = [];
   
-  // Create diverse results based on common domains
+  // Create diverse results based on common domains with more DuckDuckGo-style results
   const domains = [
-    'wikipedia.org',
-    'github.com',
-    'stackoverflow.com',
-    'medium.com',
-    'dev.to',
-    'reddit.com',
-    'youtube.com',
-    'docs.microsoft.com',
-    'developer.mozilla.org',
-    'w3schools.com'
+    { domain: 'wikipedia.org', type: 'Encyclopedia', snippet: `Comprehensive encyclopedia article about ${query}` },
+    { domain: 'github.com', type: 'Code Repository', snippet: `Open source projects and code examples for ${query}` },
+    { domain: 'stackoverflow.com', type: 'Q&A Forum', snippet: `Community questions and answers about ${query}` },
+    { domain: 'medium.com', type: 'Articles', snippet: `In-depth articles and tutorials about ${query}` },
+    { domain: 'dev.to', type: 'Developer Blog', snippet: `Developer insights and experiences with ${query}` },
+    { domain: 'reddit.com', type: 'Community Discussion', snippet: `Community discussions and experiences about ${query}` },
+    { domain: 'youtube.com', type: 'Video Tutorials', snippet: `Video tutorials and guides for ${query}` },
+    { domain: 'docs.microsoft.com', type: 'Official Documentation', snippet: `Official Microsoft documentation for ${query}` },
+    { domain: 'developer.mozilla.org', type: 'Web Documentation', snippet: `Mozilla Developer Network resources for ${query}` },
+    { domain: 'w3schools.com', type: 'Learning Platform', snippet: `Interactive tutorials and examples for ${query}` }
   ];
   
-  domains.slice(0, Math.min(limit, 5)).forEach((domain, index) => {
+  // Add more DuckDuckGo-style results
+  const duckDuckGoStyleResults = [
+    {
+      title: `${query} - Instant Answer`,
+      url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+      snippet: `Get instant answers and quick facts about ${query}`,
+      score: 0.8,
+      domain: 'duckduckgo.com'
+    },
+    {
+      title: `${query} - News`,
+      url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}&t=h_&iar=news&ia=news`,
+      snippet: `Latest news and updates about ${query}`,
+      score: 0.75,
+      domain: 'duckduckgo.com'
+    },
+    {
+      title: `${query} - Images`,
+      url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}&t=h_&iar=images&iax=images&ia=images`,
+      snippet: `Visual content and images related to ${query}`,
+      score: 0.7,
+      domain: 'duckduckgo.com'
+    },
+    {
+      title: `${query} - Videos`,
+      url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}&t=h_&iar=videos&iax=videos&ia=videos`,
+      snippet: `Video content and tutorials about ${query}`,
+      score: 0.65,
+      domain: 'duckduckgo.com'
+    }
+  ];
+  
+  // Add DuckDuckGo-style results first
+  additionalResults.push(...duckDuckGoStyleResults);
+  
+  // Then add domain-based results
+  domains.slice(0, Math.min(limit - duckDuckGoStyleResults.length, 6)).forEach((item, index) => {
     additionalResults.push({
-      title: `${query} - ${domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1)}`,
-      url: `https://${domain}/search?q=${encodeURIComponent(query)}`,
-      snippet: `Find comprehensive information about ${query} on ${domain}. Explore tutorials, documentation, and community discussions.`,
-      score: 0.7 - (index * 0.05),
+      title: `${query} - ${item.type}`,
+      url: `https://${item.domain}/search?q=${encodeURIComponent(query)}`,
+      snippet: item.snippet,
+      score: 0.6 - (index * 0.05),
       timestamp: new Date().toISOString(),
-      domain: domain,
-      favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+      domain: item.domain,
+      favicon: `https://www.google.com/s2/favicons?domain=${item.domain}&sz=32`
     });
   });
   
@@ -83,7 +119,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { query, limit = 5 } = req.body;
+    const { query, limit = 15 } = req.body;
 
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
@@ -91,8 +127,8 @@ export default async function handler(req, res) {
 
     // Use multiple search sources for more comprehensive results
     const searchPromises = [
-      // DuckDuckGo API
-      fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`),
+      // DuckDuckGo API with more comprehensive parameters
+      fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=0&t=ihsan_search`),
       // Wikipedia API for additional context
       fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`),
       // Additional search simulation
@@ -149,6 +185,62 @@ export default async function handler(req, res) {
       });
     }
     
+    // Process Definition if available
+    if (data.Definition && data.DefinitionURL) {
+      results.push({
+        title: `${query} - Definition`,
+        url: data.DefinitionURL,
+        snippet: data.Definition,
+        score: 0.85,
+        timestamp: new Date().toISOString(),
+        domain: new URL(data.DefinitionURL).hostname,
+        favicon: `https://www.google.com/s2/favicons?domain=${new URL(data.DefinitionURL).hostname}&sz=32`
+      });
+    }
+    
+    // Process Answer if available
+    if (data.Answer && data.AnswerType) {
+      results.push({
+        title: `${query} - ${data.AnswerType}`,
+        url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+        snippet: data.Answer,
+        score: 0.9,
+        timestamp: new Date().toISOString(),
+        domain: 'duckduckgo.com',
+        favicon: 'https://www.google.com/s2/favicons?domain=duckduckgo.com&sz=32'
+      });
+    }
+    
+    // Process Redirect if available
+    if (data.Redirect) {
+      results.push({
+        title: `${query} - Redirect`,
+        url: data.Redirect,
+        snippet: `Redirect to ${data.Redirect}`,
+        score: 0.75,
+        timestamp: new Date().toISOString(),
+        domain: new URL(data.Redirect).hostname,
+        favicon: `https://www.google.com/s2/favicons?domain=${new URL(data.Redirect).hostname}&sz=32`
+      });
+    }
+    
+    // Process Infobox if available
+    if (data.Infobox && data.Infobox.content) {
+      data.Infobox.content.forEach((item, index) => {
+        if (item.label && item.value) {
+          results.push({
+            title: `${query} - ${item.label}`,
+            url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+            snippet: `${item.label}: ${item.value}`,
+            score: 0.7 - (index * 0.05),
+            timestamp: new Date().toISOString(),
+            domain: 'duckduckgo.com',
+            favicon: 'https://www.google.com/s2/favicons?domain=duckduckgo.com&sz=32'
+          });
+        }
+      });
+    }
+    
     // Process images from Wikipedia
     if (wikiData.thumbnail) {
       images.push({
@@ -164,6 +256,19 @@ export default async function handler(req, res) {
         url: data.Image,
         title: data.Heading || query,
         source: data.AbstractURL || 'DuckDuckGo'
+      });
+    }
+    
+    // Process additional DuckDuckGo images if available
+    if (data.Images && Array.isArray(data.Images)) {
+      data.Images.slice(0, 3).forEach((img, index) => {
+        if (img.url) {
+          images.push({
+            url: img.url,
+            title: img.title || `${query} - Image ${index + 1}`,
+            source: 'DuckDuckGo Images'
+          });
+        }
       });
     }
     
