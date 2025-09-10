@@ -1,17 +1,13 @@
 {
-  "version": 2,
   "functions": {
-    "api/browser.js": {
+    "api/browser-simple.js": {
       "maxDuration": 30
+    },
+    "api/test.js": {
+      "maxDuration": 10
     }
   },
   "env": {
     "NODE_OPTIONS": "--dns-result-order=ipv4first"
-  },
-  "builds": [
-    {
-      "src": "api/browser.js",
-      "use": "@vercel/node"
-    }
-  ]
+  }
 }
