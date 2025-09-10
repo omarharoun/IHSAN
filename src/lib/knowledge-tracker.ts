@@ -52,12 +52,14 @@ class KnowledgeTracker {
   // Track when user clicks on a search result
   trackKnowledgeClick(searchResult: any, topic: string): KnowledgeNode {
     const nodeId = this.generateNodeId(searchResult.url, topic);
+    console.log('Tracking knowledge click:', { nodeId, topic, title: searchResult.title });
     
     // Check if already exists
     if (this.knowledgeNodes.has(nodeId)) {
       const existing = this.knowledgeNodes.get(nodeId)!;
       existing.clickedAt = new Date().toISOString();
       existing.timeSpent += 30; // Add 30 seconds for re-visit
+      console.log('Updated existing node:', existing.title);
       this.saveToStorage();
       this.notifyListeners();
       return existing;
@@ -84,6 +86,9 @@ class KnowledgeTracker {
     this.knowledgeNodes.set(nodeId, knowledgeNode);
     this.updateLearningPath(topic, knowledgeNode);
     this.generateInsights(knowledgeNode);
+    
+    console.log('Created new knowledge node:', knowledgeNode.title);
+    console.log('Total nodes now:', this.knowledgeNodes.size);
     
     // Save to localStorage
     this.saveToStorage();
@@ -364,11 +369,13 @@ class KnowledgeTracker {
       const storedNodes = localStorage.getItem('knowledge_nodes');
       if (storedNodes) {
         this.knowledgeNodes = new Map(JSON.parse(storedNodes));
+        console.log('Loaded knowledge nodes:', this.knowledgeNodes.size);
       }
       
       const storedPaths = localStorage.getItem('learning_paths');
       if (storedPaths) {
         this.learningPaths = new Map(JSON.parse(storedPaths));
+        console.log('Loaded learning paths:', this.learningPaths.size);
       }
       
       const storedInsights = localStorage.getItem('knowledge_insights');

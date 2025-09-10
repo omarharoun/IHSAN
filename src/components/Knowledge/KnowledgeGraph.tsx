@@ -38,6 +38,7 @@ export const KnowledgeGraph: React.FC = () => {
     
     // Subscribe to changes
     const unsubscribe = knowledgeTracker.subscribe(() => {
+      console.log('Knowledge graph received update notification');
       loadKnowledgeData();
     });
     
@@ -47,6 +48,7 @@ export const KnowledgeGraph: React.FC = () => {
   const loadKnowledgeData = () => {
     const allNodes = knowledgeTracker.getAllKnowledgeNodes();
     const allPaths = knowledgeTracker.getAllLearningPaths();
+    console.log('Loading knowledge data:', { allNodes: allNodes.length, allPaths: allPaths.length });
     const graphNodes: GraphNode[] = [];
     const allConnections: GraphConnection[] = [];
 

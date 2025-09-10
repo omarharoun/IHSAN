@@ -46,9 +46,11 @@ export function MawridDashboard() {
     // Subscribe to knowledge changes
     useEffect(() => {
         const unsubscribe = knowledgeTracker.subscribe(() => {
+            console.log('MawridDashboard received knowledge update');
             setKnowledgeStats(knowledgeTracker.getKnowledgeStats());
             // Refresh tracked nodes from all knowledge nodes
             const allNodes = knowledgeTracker.getAllKnowledgeNodes();
+            console.log('Updating tracked nodes:', allNodes.length);
             setTrackedNodes(allNodes.slice(-10)); // Show last 10 nodes
         });
         
@@ -88,6 +90,7 @@ export function MawridDashboard() {
 
     // Browser functions
     function handleLinkClick(url: string) {
+        console.log('Link clicked:', url);
         setBrowserUrl(url);
         setClickedLinks(prev => [...prev, url]);
         
@@ -95,9 +98,14 @@ export function MawridDashboard() {
         if (result) {
             const searchResult = result.results.find(r => r.url === url);
             if (searchResult) {
+                console.log('Tracking knowledge for:', searchResult.title);
                 knowledgeTracker.trackKnowledgeClick(searchResult, query);
                 // The subscription will automatically update the UI
+            } else {
+                console.log('No search result found for URL:', url);
             }
+        } else {
+            console.log('No result available for tracking');
         }
     }
 
