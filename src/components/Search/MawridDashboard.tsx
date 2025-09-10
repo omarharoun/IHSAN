@@ -43,6 +43,18 @@ export function MawridDashboard() {
         }
     }, [query]);
 
+    // Subscribe to knowledge changes
+    useEffect(() => {
+        const unsubscribe = knowledgeTracker.subscribe(() => {
+            setKnowledgeStats(knowledgeTracker.getKnowledgeStats());
+            // Refresh tracked nodes from all knowledge nodes
+            const allNodes = knowledgeTracker.getAllKnowledgeNodes();
+            setTrackedNodes(allNodes.slice(-10)); // Show last 10 nodes
+        });
+        
+        return unsubscribe;
+    }, []);
+
     async function handleSubmit(q?: string) {
         const text = (q ?? query).trim();
         if (!text) return;
@@ -83,9 +95,8 @@ export function MawridDashboard() {
         if (result) {
             const searchResult = result.results.find(r => r.url === url);
             if (searchResult) {
-                const knowledgeNode = knowledgeTracker.trackKnowledgeClick(searchResult, query);
-                setTrackedNodes(prev => [...prev, knowledgeNode]);
-                setKnowledgeStats(knowledgeTracker.getKnowledgeStats());
+                knowledgeTracker.trackKnowledgeClick(searchResult, query);
+                // The subscription will automatically update the UI
             }
         }
     }

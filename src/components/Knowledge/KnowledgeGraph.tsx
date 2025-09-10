@@ -35,65 +35,93 @@ export const KnowledgeGraph: React.FC = () => {
   // Load knowledge data
   useEffect(() => {
     loadKnowledgeData();
+    
+    // Subscribe to changes
+    const unsubscribe = knowledgeTracker.subscribe(() => {
+      loadKnowledgeData();
+    });
+    
+    return unsubscribe;
   }, []);
 
   const loadKnowledgeData = () => {
+    const allNodes = knowledgeTracker.getAllKnowledgeNodes();
     const allPaths = knowledgeTracker.getAllLearningPaths();
-    const allNodes: GraphNode[] = [];
+    const graphNodes: GraphNode[] = [];
     const allConnections: GraphConnection[] = [];
 
-    allPaths.forEach(path => {
-      path.nodes.forEach((node, index) => {
-        const graphNode: GraphNode = {
-          ...node,
-          x: Math.random() * 800 + 100,
-          y: Math.random() * 600 + 100,
-          vx: 0,
-          vy: 0,
-          connections: []
-        };
-        allNodes.push(graphNode);
+    // Convert knowledge nodes to graph nodes
+    allNodes.forEach((node, index) => {
+      // Check if node already exists in current graph
+      const existingNode = nodes.find(n => n.id === node.id);
+      
+      const graphNode: GraphNode = {
+        ...node,
+        x: existingNode?.x || (index === 0 ? 400 : Math.random() * 600 + 100), // First node in center, others random
+        y: existingNode?.y || (index === 0 ? 300 : Math.random() * 400 + 100),
+        vx: existingNode?.vx || 0,
+        vy: existingNode?.vy || 0,
+        connections: existingNode?.connections || []
+      };
+      
+      // If it's a new node, position it on top
+      if (!existingNode && index > 0) {
+        graphNode.x = 400 + (Math.random() - 0.5) * 200; // Center area
+        graphNode.y = 100 + Math.random() * 100; // Top area
+      }
+      
+      graphNodes.push(graphNode);
+    });
 
-        // Create connections based on related topics
-        node.relatedTopics.forEach(relatedTopic => {
-          const relatedNode = allNodes.find(n => n.topic === relatedTopic);
-          if (relatedNode) {
-            allConnections.push({
-              source: node.id,
-              target: relatedNode.id,
-              strength: 0.5,
-              type: 'related'
-            });
-          }
-        });
-
-        // Create prerequisite connections
-        node.prerequisites.forEach(prereq => {
-          const prereqNode = allNodes.find(n => n.title.toLowerCase().includes(prereq.toLowerCase()));
-          if (prereqNode) {
-            allConnections.push({
-              source: prereqNode.id,
-              target: node.id,
-              strength: 0.8,
-              type: 'prerequisite'
-            });
-          }
-        });
-
-        // Create next step connections
-        if (index < path.nodes.length - 1) {
-          const nextNode = path.nodes[index + 1];
+    // Create connections based on related topics
+    graphNodes.forEach(node => {
+      node.relatedTopics.forEach(relatedTopic => {
+        const relatedNode = graphNodes.find(n => n.topic === relatedTopic && n.id !== node.id);
+        if (relatedNode) {
           allConnections.push({
             source: node.id,
-            target: nextNode.id,
-            strength: 0.7,
-            type: 'next_step'
+            target: relatedNode.id,
+            strength: 0.5,
+            type: 'related'
+          });
+        }
+      });
+
+      // Create prerequisite connections
+      node.prerequisites.forEach(prereq => {
+        const prereqNode = graphNodes.find(n => n.title.toLowerCase().includes(prereq.toLowerCase()) && n.id !== node.id);
+        if (prereqNode) {
+          allConnections.push({
+            source: prereqNode.id,
+            target: node.id,
+            strength: 0.8,
+            type: 'prerequisite'
           });
         }
       });
     });
 
-    setNodes(allNodes);
+    // Create connections within learning paths
+    allPaths.forEach(path => {
+      path.nodes.forEach((node, index) => {
+        if (index < path.nodes.length - 1) {
+          const nextNode = path.nodes[index + 1];
+          const currentGraphNode = graphNodes.find(n => n.id === node.id);
+          const nextGraphNode = graphNodes.find(n => n.id === nextNode.id);
+          
+          if (currentGraphNode && nextGraphNode) {
+            allConnections.push({
+              source: currentGraphNode.id,
+              target: nextGraphNode.id,
+              strength: 0.7,
+              type: 'next_step'
+            });
+          }
+        }
+      });
+    });
+
+    setNodes(graphNodes);
     setConnections(allConnections);
   };
 

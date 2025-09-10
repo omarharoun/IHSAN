@@ -36,6 +36,18 @@ class KnowledgeTracker {
   private knowledgeNodes: Map<string, KnowledgeNode> = new Map();
   private learningPaths: Map<string, LearningPath> = new Map();
   private insights: KnowledgeInsight[] = [];
+  private listeners: Set<() => void> = new Set();
+
+  // Subscribe to changes
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  // Notify all listeners of changes
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener());
+  }
 
   // Track when user clicks on a search result
   trackKnowledgeClick(searchResult: any, topic: string): KnowledgeNode {
@@ -46,6 +58,8 @@ class KnowledgeTracker {
       const existing = this.knowledgeNodes.get(nodeId)!;
       existing.clickedAt = new Date().toISOString();
       existing.timeSpent += 30; // Add 30 seconds for re-visit
+      this.saveToStorage();
+      this.notifyListeners();
       return existing;
     }
 
@@ -74,6 +88,9 @@ class KnowledgeTracker {
     // Save to localStorage
     this.saveToStorage();
     
+    // Notify listeners of the change
+    this.notifyListeners();
+    
     return knowledgeNode;
   }
 
@@ -85,6 +102,11 @@ class KnowledgeTracker {
   // Get all learning paths
   getAllLearningPaths(): LearningPath[] {
     return Array.from(this.learningPaths.values());
+  }
+
+  // Get all knowledge nodes
+  getAllKnowledgeNodes(): KnowledgeNode[] {
+    return Array.from(this.knowledgeNodes.values());
   }
 
   // Get knowledge insights
