@@ -10,6 +10,8 @@ console.log('🔍 Vercel Deployment Readiness Check\n');
 const requiredFiles = [
   'api/test.js',
   'api/browser-simple.js',
+  'public/index.html',
+  'index.html',
   'vercel.json',
   'package.json'
 ];
