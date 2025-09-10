@@ -30,6 +30,19 @@ export default defineConfig({
     https: false,
     host: true,
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'https://api.tavily.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/search'),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // Add Tavily API key
+            proxyReq.setHeader('Authorization', 'Bearer YOUR_TAVILY_API_KEY');
+          });
+        }
+      }
+    }
   },
   preview: {
     host: true,
