@@ -29,6 +29,14 @@ export type SearchResponse = {
     }>;
 };
 
+// Knowledge tracking integration
+export function trackKnowledgeClick(searchResult: SearchResult, topic: string) {
+    // Import knowledge tracker dynamically to avoid circular dependencies
+    import('./knowledge-tracker').then(({ knowledgeTracker }) => {
+        return knowledgeTracker.trackKnowledgeClick(searchResult, topic);
+    });
+}
+
 export async function search(query: string, options?: { limit?: number; offset?: number; filters?: Record<string, unknown> }) {
     // Try local API first
     try {
