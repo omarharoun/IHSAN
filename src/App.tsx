@@ -8,6 +8,7 @@ import { MawridDashboard } from './components/Search/MawridDashboard';
 import { MobileNavigation } from './components/Mobile/MobileNavigation';
 import { LessonSeriesPage } from './pages/LessonSeriesPage';
 import { useAuth } from './hooks/useAuth';
+import { KnowledgeProvider } from './lib/knowledge-context';
 import { Brain, Home, Search } from 'lucide-react';
 
 // Wrapper component to manage IHSAN tab state
@@ -46,76 +47,78 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Mobile Navigation */}
-      <MobileNavigation
-        activeApp={activeApp}
-        onAppChange={setActiveApp}
-        onOpenChat={() => {}} // Will be handled by individual dashboards
-      />
+    <KnowledgeProvider>
+      <div className="min-h-screen bg-black">
+        {/* Mobile Navigation */}
+        <MobileNavigation
+          activeApp={activeApp}
+          onAppChange={setActiveApp}
+          onOpenChat={() => {}} // Will be handled by individual dashboards
+        />
 
-      {/* Desktop App Switcher */}
-      <div className="hidden lg:block bg-gray-900 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            <button
-              onClick={() => setActiveApp('mindflow')}
-              className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeApp === 'mindflow'
-                  ? 'border-blue-500 text-blue-400'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-              }`}
-            >
-              <Brain className="w-5 h-5" />
-              <span>MindFlow</span>
-            </button>
-            <button
-              onClick={() => setActiveApp('ihsan')}
-              className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeApp === 'ihsan'
-                  ? 'border-green-500 text-green-400'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-              }`}
-            >
-              <Home className="w-5 h-5" />
-              <span>IHSAN</span>
-            </button>
-            <button
-              onClick={() => setActiveApp('mawrid')}
-              className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeApp === 'mawrid'
-                  ? 'border-purple-500 text-purple-400'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-              }`}
-            >
-              <Search className="w-5 h-5" />
-              <span>Mawrid</span>
-            </button>
+        {/* Desktop App Switcher */}
+        <div className="hidden lg:block bg-gray-900 border-b border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex space-x-8">
+              <button
+                onClick={() => setActiveApp('mindflow')}
+                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeApp === 'mindflow'
+                    ? 'border-blue-500 text-blue-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                <Brain className="w-5 h-5" />
+                <span>MindFlow</span>
+              </button>
+              <button
+                onClick={() => setActiveApp('ihsan')}
+                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeApp === 'ihsan'
+                    ? 'border-green-500 text-green-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                <Home className="w-5 h-5" />
+                <span>IHSAN</span>
+              </button>
+              <button
+                onClick={() => setActiveApp('mawrid')}
+                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeApp === 'mawrid'
+                    ? 'border-purple-500 text-purple-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                <Search className="w-5 h-5" />
+                <span>Mawrid</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* App Content */}
-      <Routes>
-        <Route path="/" element={
-          <motion.div
-            key={activeApp}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="pb-20 lg:pb-0" // Add bottom padding for mobile nav
-          >
-            {activeApp === 'mindflow' ? (
-              <Dashboard />
-            ) : activeApp === 'ihsan' ? (
-              <IHSANDashboardWrapper />
-            ) : (
-              <MawridDashboard />
-            )}
-          </motion.div>
-        } />
-      </Routes>
-    </div>
+        {/* App Content */}
+        <Routes>
+          <Route path="/" element={
+            <motion.div
+              key={activeApp}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="pb-20 lg:pb-0" // Add bottom padding for mobile nav
+            >
+              {activeApp === 'mindflow' ? (
+                <Dashboard />
+              ) : activeApp === 'ihsan' ? (
+                <IHSANDashboardWrapper />
+              ) : (
+                <MawridDashboard />
+              )}
+            </motion.div>
+          } />
+        </Routes>
+      </div>
+    </KnowledgeProvider>
   );
 }
 

@@ -6,13 +6,14 @@ import { Sources } from './Sources';
 import { EmbeddedBrowser } from './EmbeddedBrowser';
 import { TextContentViewer } from './TextContentViewer';
 import { search, type SearchResponse } from '../../lib/search-client';
-import { knowledgeTracker, KnowledgeNode } from '../../lib/knowledge-tracker';
+import { useKnowledge, KnowledgeNode } from '../../lib/knowledge-context';
 import { KnowledgeGraph } from '../Knowledge/KnowledgeGraph';
 import { Search, Clock, Bookmark, ExternalLink, Brain, TrendingUp, Target, Network } from 'lucide-react';
 
 type ChatItem = { id: string; role: 'user' | 'assistant'; content: string };
 
 export function MawridDashboard() {
+    const { nodes: knowledgeNodes, addNode, getStats } = useKnowledge();
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [chat, setChat] = useState<ChatItem[]>([]);
@@ -22,11 +23,12 @@ export function MawridDashboard() {
     const [clickedLinks, setClickedLinks] = useState<string[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState<string[]>([]);
-    const [knowledgeStats, setKnowledgeStats] = useState(knowledgeTracker.getKnowledgeStats());
-    const [trackedNodes, setTrackedNodes] = useState<KnowledgeNode[]>([]);
     const [showKnowledgePanel, setShowKnowledgePanel] = useState(false);
     const [knowledgeViewMode, setKnowledgeViewMode] = useState<'list' | 'graph'>('graph');
     const inputRef = useRef<HTMLInputElement | null>(null);
+
+    const knowledgeStats = getStats();
+    const trackedNodes = knowledgeNodes.slice(-10); // Show last 10 nodes
 
     // Load suggestions when query changes
     useEffect(() => {
@@ -43,19 +45,6 @@ export function MawridDashboard() {
         }
     }, [query]);
 
-    // Subscribe to knowledge changes
-    useEffect(() => {
-        const unsubscribe = knowledgeTracker.subscribe(() => {
-            console.log('MawridDashboard received knowledge update');
-            setKnowledgeStats(knowledgeTracker.getKnowledgeStats());
-            // Refresh tracked nodes from all knowledge nodes
-            const allNodes = knowledgeTracker.getAllKnowledgeNodes();
-            console.log('Updating tracked nodes:', allNodes.length);
-            setTrackedNodes(allNodes.slice(-10)); // Show last 10 nodes
-        });
-        
-        return unsubscribe;
-    }, []);
 
     async function handleSubmit(q?: string) {
         const text = (q ?? query).trim();
@@ -99,8 +88,7 @@ export function MawridDashboard() {
             const searchResult = result.results.find(r => r.url === url);
             if (searchResult) {
                 console.log('Tracking knowledge for:', searchResult.title);
-                knowledgeTracker.trackKnowledgeClick(searchResult, query);
-                // The subscription will automatically update the UI
+                addNode(searchResult, query);
             } else {
                 console.log('No search result found for URL:', url);
             }
@@ -510,27 +498,28 @@ export function MawridDashboard() {
                                 )}
 
                                 {/* Learning Insights */}
-                                {knowledgeTracker.getInsights().length > 0 && (
+                                {knowledgeStats.totalNodes > 0 && (
                                     <div>
                                         <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
                                             <Target className="w-5 h-5" />
                                             <span>Learning Insights</span>
                                         </h3>
                                         <div className="space-y-3">
-                                            {knowledgeTracker.getInsights().slice(0, 3).map((insight, index) => (
-                                                <div key={index} className={`p-4 rounded-lg border-l-4 ${
-                                                    insight.priority === 'high' ? 'border-red-500 bg-red-900/20' :
-                                                    insight.priority === 'medium' ? 'border-yellow-500 bg-yellow-900/20' :
-                                                    'border-green-500 bg-green-900/20'
-                                                }`}>
-                                                    <p className="text-sm text-gray-300">{insight.message}</p>
-                                                    {insight.action && (
-                                                        <button className="mt-2 text-xs text-blue-400 hover:text-blue-300 underline">
-                                                            {insight.action}
-                                                        </button>
-                                                    )}
+                                            {knowledgeStats.totalNodes === 0 && (
+                                                <div className="p-4 rounded-lg border-l-4 border-green-500 bg-green-900/20">
+                                                    <p className="text-sm text-gray-300">Start exploring search results to build your knowledge map!</p>
                                                 </div>
-                                            ))}
+                                            )}
+                                            {knowledgeStats.totalNodes > 0 && knowledgeStats.masteryLevel < 50 && (
+                                                <div className="p-4 rounded-lg border-l-4 border-yellow-500 bg-yellow-900/20">
+                                                    <p className="text-sm text-gray-300">You've explored many topics, consider revisiting some to deepen your understanding.</p>
+                                                </div>
+                                            )}
+                                            {knowledgeStats.totalNodes > 0 && knowledgeStats.masteryLevel >= 50 && (
+                                                <div className="p-4 rounded-lg border-l-4 border-green-500 bg-green-900/20">
+                                                    <p className="text-sm text-gray-300">Great progress! You're mastering your knowledge areas.</p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}

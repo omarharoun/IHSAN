@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { knowledgeTracker, KnowledgeNode, LearningPath } from '../../lib/knowledge-tracker';
+import { useKnowledge, KnowledgeNode } from '../../lib/knowledge-context';
 import { X, Move, Trash2, Link, Unlink, Plus, Minus } from 'lucide-react';
 
 interface GraphNode extends KnowledgeNode {
@@ -20,6 +20,7 @@ interface GraphConnection {
 }
 
 export const KnowledgeGraph: React.FC = () => {
+  const { nodes: knowledgeNodes, deleteNode } = useKnowledge();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [connections, setConnections] = useState<GraphConnection[]>([]);
@@ -32,45 +33,29 @@ export const KnowledgeGraph: React.FC = () => {
   const [isPanning, setIsPanning] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
 
-  // Load knowledge data
+  // Load knowledge data when knowledgeNodes change
   useEffect(() => {
+    console.log('Knowledge graph updating with nodes:', knowledgeNodes.length);
     loadKnowledgeData();
-    
-    // Subscribe to changes
-    const unsubscribe = knowledgeTracker.subscribe(() => {
-      console.log('Knowledge graph received update notification');
-      loadKnowledgeData();
-    });
-    
-    return unsubscribe;
-  }, []);
+  }, [knowledgeNodes]);
 
   const loadKnowledgeData = () => {
-    const allNodes = knowledgeTracker.getAllKnowledgeNodes();
-    const allPaths = knowledgeTracker.getAllLearningPaths();
-    console.log('Loading knowledge data:', { allNodes: allNodes.length, allPaths: allPaths.length });
     const graphNodes: GraphNode[] = [];
     const allConnections: GraphConnection[] = [];
 
     // Convert knowledge nodes to graph nodes
-    allNodes.forEach((node, index) => {
+    knowledgeNodes.forEach((node, index) => {
       // Check if node already exists in current graph
       const existingNode = nodes.find(n => n.id === node.id);
       
       const graphNode: GraphNode = {
         ...node,
-        x: existingNode?.x || (index === 0 ? 400 : Math.random() * 600 + 100), // First node in center, others random
-        y: existingNode?.y || (index === 0 ? 300 : Math.random() * 400 + 100),
+        x: existingNode?.x || (index === 0 ? 400 : 400 + (Math.random() - 0.5) * 200), // Center area
+        y: existingNode?.y || (index === 0 ? 300 : 100 + Math.random() * 100), // Top area
         vx: existingNode?.vx || 0,
         vy: existingNode?.vy || 0,
         connections: existingNode?.connections || []
       };
-      
-      // If it's a new node, position it on top
-      if (!existingNode && index > 0) {
-        graphNode.x = 400 + (Math.random() - 0.5) * 200; // Center area
-        graphNode.y = 100 + Math.random() * 100; // Top area
-      }
       
       graphNodes.push(graphNode);
     });
@@ -99,26 +84,6 @@ export const KnowledgeGraph: React.FC = () => {
             strength: 0.8,
             type: 'prerequisite'
           });
-        }
-      });
-    });
-
-    // Create connections within learning paths
-    allPaths.forEach(path => {
-      path.nodes.forEach((node, index) => {
-        if (index < path.nodes.length - 1) {
-          const nextNode = path.nodes[index + 1];
-          const currentGraphNode = graphNodes.find(n => n.id === node.id);
-          const nextGraphNode = graphNodes.find(n => n.id === nextNode.id);
-          
-          if (currentGraphNode && nextGraphNode) {
-            allConnections.push({
-              source: currentGraphNode.id,
-              target: nextGraphNode.id,
-              strength: 0.7,
-              type: 'next_step'
-            });
-          }
         }
       });
     });
@@ -352,8 +317,8 @@ export const KnowledgeGraph: React.FC = () => {
   };
 
   // Node actions
-  const deleteNode = (nodeId: string) => {
-    setNodes(prev => prev.filter(node => node.id !== nodeId));
+  const handleDeleteNode = (nodeId: string) => {
+    deleteNode(nodeId);
     setConnections(prev => prev.filter(conn => conn.source !== nodeId && conn.target !== nodeId));
     if (selectedNode?.id === nodeId) {
       setSelectedNode(null);
@@ -494,7 +459,7 @@ export const KnowledgeGraph: React.FC = () => {
           
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => deleteNode(selectedNode.id)}
+              onClick={() => handleDeleteNode(selectedNode.id)}
               className="flex items-center space-x-1 px-3 py-1 bg-red-900 text-red-300 rounded hover:bg-red-800"
             >
               <Trash2 className="w-4 h-4" />
