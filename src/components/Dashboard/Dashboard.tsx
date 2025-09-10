@@ -184,12 +184,15 @@ export function Dashboard() {
         />
       )}
 
+      {/* Desktop Series Viewer - only show on desktop */}
       {selectedSeries && (
-        <SeriesViewer
-          series={selectedSeries}
-          onClose={() => setSelectedSeries(null)}
-          onUpdateSeries={handleUpdateSeries}
-        />
+        <div className="hidden lg:block">
+          <SeriesViewer
+            series={selectedSeries}
+            onClose={() => setSelectedSeries(null)}
+            onUpdateSeries={handleUpdateSeries}
+          />
+        </div>
       )}
       
       {streamingLesson && (

@@ -1961,17 +1961,17 @@ react-refresh@^0.17.0:
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.17.0.tgz"
   integrity sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==
 
-react-router-dom@^7.7.1:
-  version "7.7.1"
-  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-7.7.1.tgz"
-  integrity sha512-bavdk2BA5r3MYalGKZ01u8PGuDBloQmzpBZVhDLrOOv1N943Wq6dcM9GhB3x8b7AbqPMEezauv4PeGkAJfy7FQ==
+react-router-dom@^7.8.2:
+  version "7.8.2"
+  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-7.8.2.tgz"
+  integrity sha512-Z4VM5mKDipal2jQ385H6UBhiiEDlnJPx6jyWsTYoZQdl5TrjxEV2a9yl3Fi60NBJxYzOTGTTHXPi0pdizvTwow==
   dependencies:
-    react-router "7.7.1"
+    react-router "7.8.2"
 
-react-router@7.7.1:
-  version "7.7.1"
-  resolved "https://registry.npmjs.org/react-router/-/react-router-7.7.1.tgz"
-  integrity sha512-jVKHXoWRIsD/qS6lvGveckwb862EekvapdHJN/cGmzw40KnJH5gg53ujOJ4qX6EKIK9LSBfFed/xiQ5yeXNrUA==
+react-router@7.8.2:
+  version "7.8.2"
+  resolved "https://registry.npmjs.org/react-router/-/react-router-7.8.2.tgz"
+  integrity sha512-7M2fR1JbIZ/jFWqelpvSZx+7vd7UlBTfdZqf6OSdF9g6+sfdqJDAWcak6ervbHph200ePlu+7G8LdoiC3ReyAQ==
   dependencies:
     cookie "^1.0.1"
     set-cookie-parser "^2.6.0"

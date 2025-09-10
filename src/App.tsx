@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthForm } from './components/Auth/AuthForm';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { IHSANDashboard } from './components/IHSANDashboard/IHSANDashboard';
 import { MobileNavigation } from './components/Mobile/MobileNavigation';
+import { LessonSeriesPage } from './pages/LessonSeriesPage';
 import { useAuth } from './hooks/useAuth';
 import { Brain, Home } from 'lucide-react';
 
@@ -16,6 +18,10 @@ const IHSANDashboardWrapper: React.FC = () => {
 function App() {
   const { user, loading } = useAuth();
   const [activeApp, setActiveApp] = useState<'mindflow' | 'ihsan'>('mindflow');
+  const location = useLocation();
+
+  // Check if we're on a lesson series page
+  const isLessonSeriesPage = location.pathname.startsWith('/lesson-series/');
 
   if (loading) {
     return (
@@ -27,6 +33,15 @@ function App() {
 
   if (!user) {
     return <AuthForm />;
+  }
+
+  // If we're on a lesson series page, render it directly without the main app layout
+  if (isLessonSeriesPage) {
+    return (
+      <Routes>
+        <Route path="/lesson-series/:seriesId" element={<LessonSeriesPage />} />
+      </Routes>
+    );
   }
 
   return (
@@ -69,19 +84,23 @@ function App() {
       </div>
 
       {/* App Content */}
-      <motion.div
-        key={activeApp}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="pb-20 lg:pb-0" // Add bottom padding for mobile nav
-      >
-        {activeApp === 'mindflow' ? (
-          <Dashboard />
-        ) : (
-          <IHSANDashboardWrapper />
-        )}
-      </motion.div>
+      <Routes>
+        <Route path="/" element={
+          <motion.div
+            key={activeApp}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="pb-20 lg:pb-0" // Add bottom padding for mobile nav
+          >
+            {activeApp === 'mindflow' ? (
+              <Dashboard />
+            ) : (
+              <IHSANDashboardWrapper />
+            )}
+          </motion.div>
+        } />
+      </Routes>
     </div>
   );
 }

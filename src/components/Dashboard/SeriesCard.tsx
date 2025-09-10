@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Clock, BookOpen, Trash2, CheckCircle, Circle } from 'lucide-react';
 import { LessonSeries } from '../../types';
 
 interface SeriesCardProps {
   series: LessonSeries;
-  onSelect: (series: LessonSeries) => void;
+  onSelect?: (series: LessonSeries) => void; // Made optional for backward compatibility
   onDelete: (seriesId: string) => void;
 }
 
@@ -20,8 +21,22 @@ const categoryColors = {
 };
 
 export function SeriesCard({ series, onSelect, onDelete }: SeriesCardProps) {
+  const navigate = useNavigate();
   const colorClass = categoryColors[series.category as keyof typeof categoryColors] || categoryColors.other;
   const progressPercentage = (series.completed_lessons / series.total_lessons) * 100;
+
+  const handleCardClick = () => {
+    // Check if we're on mobile (screen width < 1024px)
+    const isMobile = window.innerWidth < 1024;
+    
+    if (isMobile) {
+      // Navigate to mobile lesson viewer
+      navigate(`/lesson-series/${series.id}`);
+    } else {
+      // Use the old modal behavior for desktop
+      onSelect?.(series);
+    }
+  };
 
   return (
     <motion.div
@@ -30,7 +45,7 @@ export function SeriesCard({ series, onSelect, onDelete }: SeriesCardProps) {
       whileHover={{ scale: 1.05, y: -5 }}
       whileTap={{ scale: 0.98 }}
       className="relative group cursor-pointer"
-      onClick={() => onSelect(series)}
+      onClick={handleCardClick}
     >
       <div className={`bg-gradient-to-br ${colorClass} rounded-2xl p-6 h-72 flex flex-col justify-between shadow-xl`}>
         <div className="flex justify-between items-start">
